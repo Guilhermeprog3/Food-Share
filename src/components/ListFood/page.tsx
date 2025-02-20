@@ -16,7 +16,7 @@ type CardProps = React.ComponentProps<typeof Card>
 export function CardDemo({ className, ...props }: CardProps) {
 
   function handlecreate(){
-    redirect('/createaliments')
+    redirect('/aliments_create')
    }
    
   return (

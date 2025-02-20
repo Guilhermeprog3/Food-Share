@@ -26,7 +26,7 @@ export function CardDemoList({ className, ...props }: CardProps) {
   const [alimentos, setAlimentos] = useState<Aliment[]>([]);
 
   function handleedit(id:string){
-    redirect(`/editaliments/${id}`)
+    redirect(`/editaraliments/${id}`)
    }
 
   useEffect(() => {

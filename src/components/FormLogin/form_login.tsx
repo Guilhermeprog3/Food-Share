@@ -57,7 +57,7 @@ export function Form_Login() {
       <div className=" ml-80">
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="mr-56 mt-12 space-y-6 p-20 rounded-3xl shadow-lg max-w-3xl mx-auto bg-card text-card-foreground"
+          className=" mt-12 space-y-6 p-20 rounded-3xl shadow-lg max-w-3xl mx-auto bg-card text-card-foreground"
           style={{ position: "absolute", zIndex: 10 }}
         >
           <div className="text-center">

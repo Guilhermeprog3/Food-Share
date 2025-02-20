@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar_public";
 const Register_Page = () => {
   return (
     <div>
-      <div className="mb-9" style={{ zIndex: 5 }}>
+      <div className="mb-9">
         <Navbar />
       </div>
 
