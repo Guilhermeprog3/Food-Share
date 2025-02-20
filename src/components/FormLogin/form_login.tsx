@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { redirect } from "next/navigation"
+import { signIn } from "next-auth/react";
 
 const formSchema = z.object({
   Email: z.string()
@@ -24,8 +25,15 @@ const formSchema = z.object({
     .min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
 })
 
-function onSubmit(values: z.infer<typeof formSchema>) {
-  console.log(values)
+async function onSubmit(values: z.infer<typeof formSchema>) {
+  const email = values.Email
+  const password = values.Password
+
+  await signIn("credentials", {
+    email,
+    password,
+    callbackUrl: "/dashboard",
+  });
 }
 function HandleRegister(){
   redirect("/register")

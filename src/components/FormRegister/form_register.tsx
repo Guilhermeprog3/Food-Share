@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,9 +12,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { redirect } from "next/navigation"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { redirect } from "next/navigation";
+import { handleSubmit } from "./action"; 
 
 const formSchema = z.object({
   Nome: z.string()
@@ -30,13 +31,10 @@ const formSchema = z.object({
     .min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
   ConfirmarSenha: z.string()
     .min(6, { message: "A confirmação de senha deve ter pelo menos 6 caracteres." })
-})
+});
 
-function onSubmit(values: z.infer<typeof formSchema>) {
-  console.log(values)
-}
 function HandleLogin(){
-  redirect("/login")
+  redirect("/")
 }
 
 export function Form_Register() {
@@ -50,7 +48,18 @@ export function Form_Register() {
       Senha: "",
       ConfirmarSenha: "",
     },
-  })
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const formData = new FormData();
+    formData.append("Nome", values.Nome);
+    formData.append("CNPJ", values.CNPJ);
+    formData.append("Responsavel", values.Responsavel);
+    formData.append("Email", values.Email);
+    formData.append("Senha", values.Senha);
+
+    await handleSubmit(formData);
+  }
 
   return (
     <Form {...form}>
@@ -146,5 +155,5 @@ export function Form_Register() {
         </div>
       </form>
     </Form>
-  )
+  );
 }
