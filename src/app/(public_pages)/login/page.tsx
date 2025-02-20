@@ -1,5 +1,5 @@
 import { Form_Login } from "@/components/FormLogin/form_login";
-import Navbar from "@/components/Navbar_login";
+import Navbar from "@/components/Navbar_public";
 
 const LoginPage = () => {
     return (

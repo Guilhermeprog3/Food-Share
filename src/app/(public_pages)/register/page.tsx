@@ -1,5 +1,5 @@
 import { Form_Register } from "@/components/FormRegister/form_register";
-import Navbar from "@/components/Navbar_login";
+import Navbar from "@/components/Navbar_public";
 
 const Register_Page = () => {
     return ( 
