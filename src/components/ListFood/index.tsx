@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { CardDemoList } from "../CardList/page";
+import { CardDemoList } from "../CardList/index";
 import {
   Card,
   CardContent,
