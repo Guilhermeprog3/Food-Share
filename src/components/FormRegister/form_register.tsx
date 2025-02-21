@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import bg from "@/assets/images/background2.png";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,26 +16,32 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { redirect } from "next/navigation";
-import { handleSubmit } from "./action"; 
+import { handleSubmit } from "./action";
 
 const formSchema = z.object({
-  Nome: z.string()
+  Nome: z
+    .string()
     .min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
-  CNPJ: z.string()
+  CNPJ: z
+    .string()
     .min(14, { message: "O CNPJ deve ter pelo menos 14 caracteres." }),
-  Responsavel: z.string()
-    .min(2, { message: "O nome do responsável deve ter pelo menos 2 caracteres." }),
-  Email: z.string()
+  Responsavel: z.string().min(2, {
+    message: "O nome do responsável deve ter pelo menos 2 caracteres.",
+  }),
+  Email: z
+    .string()
     .min(2, { message: "O e-mail deve ter pelo menos 2 caracteres." })
     .email({ message: "Digite um e-mail válido." }),
-  Senha: z.string()
+  Senha: z
+    .string()
     .min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
-  ConfirmarSenha: z.string()
-    .min(6, { message: "A confirmação de senha deve ter pelo menos 6 caracteres." })
+  ConfirmarSenha: z.string().min(6, {
+    message: "A confirmação de senha deve ter pelo menos 6 caracteres.",
+  }),
 });
 
-function HandleLogin(){
-  redirect("/")
+function HandleLogin() {
+  redirect("/");
 }
 
 export function Form_Register() {
@@ -63,7 +70,12 @@ export function Form_Register() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-20 rounded-3xl shadow-lg max-w-3xl mx-auto bg-card text-card-foreground">
+      <img className="fixed h-auto" src={bg.src} alt="" />
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 p-20 rounded-3xl shadow-lg max-w-3xl mx-auto bg-card text-card-foreground mt-5"
+        style={{ zIndex: 10 }}
+      >
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">CADASTRO</h2>
         </div>
@@ -75,7 +87,11 @@ export function Form_Register() {
               <FormItem>
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
-                  <Input className="w-full p-2 border border-gray-300 rounded-lg" placeholder="Digite seu nome" {...field} />
+                  <Input
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    placeholder="Digite seu nome"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -88,7 +104,11 @@ export function Form_Register() {
               <FormItem>
                 <FormLabel>CNPJ</FormLabel>
                 <FormControl>
-                  <Input className="w-full p-2 border border-gray-300 rounded-lg" placeholder="Digite seu CNPJ" {...field} />
+                  <Input
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    placeholder="Digite seu CNPJ"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -101,7 +121,11 @@ export function Form_Register() {
               <FormItem>
                 <FormLabel>Responsável</FormLabel>
                 <FormControl>
-                  <Input className="w-full p-2 border border-gray-300 rounded-lg" placeholder="Digite o nome do responsável" {...field} />
+                  <Input
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    placeholder="Digite o nome do responsável"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -114,7 +138,11 @@ export function Form_Register() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input className="w-full p-2 border border-gray-300 rounded-lg" placeholder="Digite seu e-mail" {...field} />
+                  <Input
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    placeholder="Digite seu e-mail"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -127,7 +155,12 @@ export function Form_Register() {
               <FormItem>
                 <FormLabel>Senha</FormLabel>
                 <FormControl>
-                  <Input type="password" className="w-full p-2 border border-gray-300 rounded-lg" placeholder="Digite sua senha" {...field} />
+                  <Input
+                    type="password"
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    placeholder="Digite sua senha"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -140,18 +173,33 @@ export function Form_Register() {
               <FormItem>
                 <FormLabel>Confirmar Senha</FormLabel>
                 <FormControl>
-                  <Input type="password" className="w-full p-2 border border-gray-300 rounded-lg" placeholder="Confirme sua senha" {...field} />
+                  <Input
+                    type="password"
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    placeholder="Confirme sua senha"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
         </div>
-        <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200" type="submit">Cadastrar</Button>
+        <Button
+          className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200"
+          type="submit"
+        >
+          Cadastrar
+        </Button>
 
         <div className="flex justify-center items-center mt-4">
           <p className="mr-2">Já tem conta? Entre </p>
-          <button onClick={HandleLogin} className="text-blue-500 hover:underline">aqui</button>
+          <button
+            onClick={HandleLogin}
+            className="text-blue-500 hover:underline"
+          >
+            aqui
+          </button>
         </div>
       </form>
     </Form>
