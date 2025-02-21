@@ -7,7 +7,7 @@ import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Form,
@@ -23,26 +23,29 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-
+import { redirect } from "next/navigation"
+import { DayPicker } from "react-day-picker"
+import { useState } from "react"
 
 const formSchema = z.object({
   name: z.string()
-    .min(1, { message: "O Campos não pode estar vazio." }),
+    .min(1, { message: "O campo não pode estar vazio." }),
   quantity: z.number()
     .min(1, { message: "O campo não pode estar vazio." }),
-  expirationtime:z.date()
+  expirationtime: z.date()
 })
 
-
-
-async function onSubmit() {
-
+const onSubmit = () => {
+  alert("Coma pintos")
+  console.log("penis")
 }
 
-
+function onCancel() {
+  redirect("/listfood");
+}
 
 export function Form_CreateAliments() {
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,88 +55,73 @@ export function Form_CreateAliments() {
     
   })
 
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+    form.setValue("expirationtime", date);  // Atualizando o valor no form
+  };
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-20 rounded-3xl shadow-lg max-w-3xl mx-auto bg-card text-card-foreground">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Cadastrar Alimento</h2>
+    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-20 rounded-3xl shadow-lg max-w-3xl mx-auto bg-card text-card-foreground">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-4">Cadastrar Alimento</h2>
+      </div>
+      <div className="flex flex-col gap-8">
+        <div>
+          <h2>Nome</h2>
+          <input
+            {...form.register("name")}
+            type="text"
+            placeholder="Nome"
+            className="w-full p-2 border bg-transparent border-gray-300 rounded-lg placeholder:font-bold"
+          />
         </div>
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input className="w-full p-2 border border-gray-300 rounded-lg" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="quantity"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Quantidade</FormLabel>
-              <FormControl>
-                <Input type="number" className="w-full p-2 border border-gray-300 rounded-lg" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
-        <FormField
-          control={form.control}
-          name="expirationtime"
-          render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Data de Validade</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP")
-                      ) : (
-                        <span>Escolha a data</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
+        <div>
+          <h2>Quantidade</h2>
+          <input
+            {...form.register("quantity", { valueAsNumber: true })}
+            type="number"
+            placeholder="0"
+            className="w-full p-2 border bg-transparent border-gray-300 rounded-lg placeholder:font-bold"
+          />
+        </div>
 
-        <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200" type="submit">Entrar</Button>
+        <div>
+          <h2>Data de Validade</h2>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="w-full p-2 border bg-transparent border-gray-300 rounded-lg placeholder:font-bold flex items-center justify-between"
+              >
+                {selectedDate ? format(selectedDate, "dd/MM/yyyy") : "Selecione a data"}
+                <CalendarIcon className="w-5 h-5" />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="p-0">
+              <DayPicker selected={selectedDate} onDayClick={handleDateChange} />
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+<div className="flex gap-5">
+      <button
+        className="w-full bg-destructive text-primary-foreground py-2 rounded-2xl hover:bg-red-900"
+        type="button"
+        onClick={onCancel}
+      >
+        Cancelar
+      </button>
+      <button
+        className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200"
+        type="submit"
+      >
+        Entrar
+      </button>
 
-
-        
-      </form>
-    </Form>
+</div>
+    </form>
   )
 }
