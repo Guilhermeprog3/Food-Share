@@ -1,5 +1,8 @@
 "use client";
-import { Card, CardHeader } from "@/components/ui/card"
+
+import { Card, CardHeader, CardFooter, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button";
+
 const schedules = [
   {
     id: 1,
@@ -33,6 +36,12 @@ export function SchedulesList() {
           {schedules.map((schedule) => (
             <Card key={schedule.id}>
               <CardHeader>{schedule.name}</CardHeader>
+              <CardContent>00</CardContent>
+              <CardFooter>
+                <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200">QR code</Button>
+                <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200">Editar</Button>
+                <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200">Excuir</Button>
+              </CardFooter>
             </Card>
           ))}
         </div>
