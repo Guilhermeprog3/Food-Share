@@ -9,7 +9,7 @@ const PrivateLayout = async ({ children }: { children: ReactNode }) => {
     redirect("/");
   }
   
-  return <div>{children}</div>;
+  return <div> {children}</div>;
 };
 
 export default PrivateLayout;
