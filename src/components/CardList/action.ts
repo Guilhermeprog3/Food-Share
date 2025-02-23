@@ -21,7 +21,7 @@ const deleteAliments = async (id: string) => {
   }
 
   try {
-    const response = await api.delete(`/alimentos/${id}`, {
+    const response = await api.delete(`/api/alimentos/${id}`, {
       headers: { authorization: `Bearer ${jwt.value}` },
     });
 

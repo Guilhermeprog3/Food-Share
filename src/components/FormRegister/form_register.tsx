@@ -19,25 +19,15 @@ import { redirect } from "next/navigation";
 import { handleSubmit } from "./action";
 
 const formSchema = z.object({
-  Nome: z
-    .string()
-    .min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
-  CNPJ: z
-    .string()
-    .min(14, { message: "O CNPJ deve ter pelo menos 14 caracteres." }),
-  Responsavel: z.string().min(2, {
-    message: "O nome do responsável deve ter pelo menos 2 caracteres.",
-  }),
-  Email: z
-    .string()
+  name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
+  cnpj: z.string().min(14, { message: "O CNPJ deve ter pelo menos 14 caracteres." }),
+  responsible: z.string().min(2, { message: "O nome do responsável deve ter pelo menos 2 caracteres." }),
+  email: z.string()
     .min(2, { message: "O e-mail deve ter pelo menos 2 caracteres." })
     .email({ message: "Digite um e-mail válido." }),
-  Senha: z
-    .string()
-    .min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
-  ConfirmarSenha: z.string().min(6, {
-    message: "A confirmação de senha deve ter pelo menos 6 caracteres.",
-  }),
+  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
+  confirmPassword: z.string().min(6, { message: "A confirmação de senha deve ter pelo menos 6 caracteres." }),
+  local: z.string().min(2, { message: "A cidade deve ter pelo menos 2 caracteres." }),
 });
 
 function HandleLogin() {
@@ -48,22 +38,24 @@ export function Form_Register() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      Nome: "",
-      CNPJ: "",
-      Responsavel: "",
-      Email: "",
-      Senha: "",
-      ConfirmarSenha: "",
+      name: "",
+      cnpj: "",
+      responsible: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      local: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const formData = new FormData();
-    formData.append("Nome", values.Nome);
-    formData.append("CNPJ", values.CNPJ);
-    formData.append("Responsavel", values.Responsavel);
-    formData.append("Email", values.Email);
-    formData.append("Senha", values.Senha);
+    formData.append("name", values.name);
+    formData.append("cnpj", values.cnpj);
+    formData.append("responsible", values.responsible);
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    formData.append("local", values.local);
 
     await handleSubmit(formData);
   }
@@ -82,7 +74,7 @@ export function Form_Register() {
         <div className="grid grid-cols-2 gap-6">
           <FormField
             control={form.control}
-            name="Nome"
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nome</FormLabel>
@@ -99,7 +91,7 @@ export function Form_Register() {
           />
           <FormField
             control={form.control}
-            name="CNPJ"
+            name="cnpj"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>CNPJ</FormLabel>
@@ -116,7 +108,7 @@ export function Form_Register() {
           />
           <FormField
             control={form.control}
-            name="Responsavel"
+            name="responsible"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Responsável</FormLabel>
@@ -133,7 +125,7 @@ export function Form_Register() {
           />
           <FormField
             control={form.control}
-            name="Email"
+            name="email"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
@@ -150,7 +142,7 @@ export function Form_Register() {
           />
           <FormField
             control={form.control}
-            name="Senha"
+            name="password"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Senha</FormLabel>
@@ -168,7 +160,7 @@ export function Form_Register() {
           />
           <FormField
             control={form.control}
-            name="ConfirmarSenha"
+            name="confirmPassword"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Confirmar Senha</FormLabel>
@@ -177,6 +169,23 @@ export function Form_Register() {
                     type="password"
                     className="w-full p-2 border border-gray-300 rounded-lg"
                     placeholder="Confirme sua senha"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-xs" />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="local"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cidade</FormLabel>
+                <FormControl>
+                  <Input
+                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    placeholder="Digite sua cidade"
                     {...field}
                   />
                 </FormControl>

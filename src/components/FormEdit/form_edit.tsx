@@ -1,14 +1,14 @@
-"use client";
+"use client"
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
 
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Form,
   FormControl,
@@ -16,42 +16,41 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { handleSubmit } from "./action";
-import { redirect } from "next/navigation";
+} from "@/components/ui/popover"
+
 
 const formSchema = z.object({
-  name: z.string().min(1, { message: "O campo não pode estar vazio." }),
-  quantity: z.coerce.number().min(1, { message: "O campo não pode estar vazio." }),
-  expiration_time: z.coerce.date(),
-});
+  name: z.string()
+    .min(1, { message: "O Campos não pode estar vazio." }),
+  quantity: z.number()
+    .min(1, { message: "O campo não pode estar vazio." }),
+  expirationtime:z.date()
+})
 
-async function onSubmit(values: z.infer<typeof formSchema>) {
-  const formData = new FormData();
-  formData.append("name", values.name);
-  formData.append("quantity", values.quantity.toString());
-  formData.append("expiration_time", values.expiration_time.toISOString());
-  
-  await handleSubmit(formData);
 
-  redirect("/listfood");
+
+async function onSubmit() {
+
 }
 
-export function Form_CreateAliments() {
+
+
+export function FormEdit() {
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
       quantity: 0,
-      expiration_time: new Date(),
     },
-  });
+    
+  })
 
   return (
     <Form {...form}>
@@ -64,7 +63,7 @@ export function Form_CreateAliments() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input className="w-full p-2 border border-gray-300 rounded-lg" {...field} />
               </FormControl>
@@ -89,7 +88,7 @@ export function Form_CreateAliments() {
 
         <FormField
           control={form.control}
-          name="expiration_time"
+          name="expirationtime"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Data de Validade</FormLabel>
@@ -118,7 +117,7 @@ export function Form_CreateAliments() {
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) =>
-                      date < new Date("1900-01-01")
+                      date > new Date() || date < new Date("1900-01-01")
                     }
                     initialFocus
                   />
@@ -128,9 +127,13 @@ export function Form_CreateAliments() {
             </FormItem>
           )}
         />
+        
 
-        <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200" type="submit">Cadastrar</Button>
+        <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200" type="submit">Entrar</Button>
+
+
+        
       </form>
     </Form>
-  );
+  )
 }
