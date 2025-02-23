@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/card"
 const schedules = [
   {
