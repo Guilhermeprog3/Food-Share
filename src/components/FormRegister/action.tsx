@@ -10,7 +10,7 @@ export async function handleSubmit(formdata: FormData) {
   const email = formdata.get("Email");
   const senha = formdata.get("Senha");
 
-  await api.post('doadores', {
+  await api.post('api/doadores', {
     nome, cnpj, responsavel, email, senha
   });
 

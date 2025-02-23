@@ -23,21 +23,30 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { handleSubmit } from "./action"
+import { redirect } from "next/navigation"
 
 
 const formSchema = z.object({
-  name: z.string()
+  Name: z.string()
     .min(1, { message: "O Campos não pode estar vazio." }),
-  quantity: z.number()
+  Quantity: z.coerce.number()
     .min(1, { message: "O campo não pode estar vazio." }),
-  expirationtime:z.date()
+  Expirationtime:z.coerce.date()
 })
 
 
 
-async function onSubmit() {
+async function onSubmit(values: z.infer<typeof formSchema>) {
+    const formData = new FormData();
+    formData.append("Nome", values.Name);
+    formData.append("Quantidade", values.Quantity.toString());
+    formData.append("Data-Validade", values.Expirationtime.toString());
+    
+    await handleSubmit(formData);
 
-}
+    redirect("/listfood")
+  }
 
 
 
@@ -46,8 +55,8 @@ export function Form_CreateAliments() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      quantity: 0,
+      Name: "",
+      Quantity: 0,
     },
     
   })
@@ -60,7 +69,7 @@ export function Form_CreateAliments() {
         </div>
         <FormField
           control={form.control}
-          name="name"
+          name="Name"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
@@ -74,7 +83,7 @@ export function Form_CreateAliments() {
         
         <FormField
           control={form.control}
-          name="quantity"
+          name="Quantity"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Quantidade</FormLabel>
@@ -88,7 +97,7 @@ export function Form_CreateAliments() {
 
         <FormField
           control={form.control}
-          name="expirationtime"
+          name="Expirationtime"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Data de Validade</FormLabel>
