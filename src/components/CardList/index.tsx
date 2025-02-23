@@ -13,18 +13,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown, MoreHorizontal } from "lucide-react";
-import { deleteAliments } from "./action";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { deleteAliments, fetchAliments } from "./action";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -35,7 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { fetchAliments } from "./action";
+import { redirect } from "next/navigation";
 
 type Aliment = {
   id: string;
@@ -66,31 +56,23 @@ export const columns: ColumnDef<Aliment>[] = [
     cell: ({ row }) => {
       const aliment = row.original;
 
+      const handleDelete = async (id: string) => {
+        await deleteAliments(id);
+      };
+
+      const handleedit = (id:string) => {
+          redirect(`/editaraliments/${id}`);
+      }
+
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Abrir menu</span>
-              <MoreHorizontal />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Ações</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(aliment.id)}
-            >
-              Copiar ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => {
-                deleteAliments(aliment.id)
-              }}
-            >
-              Excluir
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" onClick={() => handleDelete(aliment.id)}>
+            Excluir
+          </Button>
+          <Button variant="outline" onClick={() =>handleedit(aliment.id)}>
+            Editar
+          </Button>
+        </div>
       );
     },
   },
@@ -105,12 +87,13 @@ export function CardDemoList() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
 
+  const reloadData = async () => {
+    const data = await fetchAliments();
+    setAlimentos(data);
+  };
+
   useEffect(() => {
-    const getAlimentos = async () => {
-      const data = await fetchAliments();
-      setAlimentos(data);
-    };
-    getAlimentos();
+    reloadData();
   }, []);
 
   const table = useReactTable({
@@ -141,32 +124,6 @@ export function CardDemoList() {
           }
           className="max-w-sm"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Colunas <ChevronDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <div className="rounded-md border">
         <Table>

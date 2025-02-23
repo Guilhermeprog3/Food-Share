@@ -4,14 +4,15 @@ import { api } from '@/app/service/server';
 import { redirect } from 'next/navigation';
 
 export async function handleSubmit(formdata: FormData) {
-  const nome = formdata.get("Nome");
-  const cnpj = formdata.get("CNPJ");
-  const responsavel = formdata.get("Responsavel");
-  const email = formdata.get("Email");
-  const senha = formdata.get("Senha");
+  const name = formdata.get("name");
+  const cnpj = formdata.get("cnpj");
+  const responsible = formdata.get("responsible");
+  const email = formdata.get("email");
+  const password = formdata.get("password");
+  const local = formdata.get("local");
 
   await api.post('api/doadores', {
-    nome, cnpj, responsavel, email, senha
+    name, cnpj, responsible, email, password, local
   });
 
   return redirect('/');

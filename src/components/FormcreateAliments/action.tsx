@@ -1,44 +1,34 @@
 "use server";
 
 import { api } from '@/app/service/server';
-import { promises } from 'dns';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-type Alimentos={
-  name:string;
-  quantity:number;
-  expiration_time:Date
-}
 
-type Props={
-  Alimentos:FormData;
-}
 
-export async function handleSubmit(formdata: FormData):Promise<Alimentos> {
+export async function handleSubmit(formdata: FormData): Promise<void> {
   const token = (await cookies()).get("JWT")?.value;
 
-  console.log(token);
+  const name = formdata.get("name");
+  const quantity = formdata.get("quantity");
+  const expiration_time = formdata.get("expiration_time");
 
-  const name = formdata.get("Nome");
-  const quantity = formdata.get("Quantidade");
-  const expiration_time = formdata.get("Data-Validade");
+  const data = {
+    name,
+    quantity: parseInt(quantity as string, 10),
+    expiration_time: new Date(expiration_time as string),
+  };
 
-  
-  console.log(name)
-  console.log(quantity)
-  console.log(expiration_time)
-
-
-  const response=await api.post('api/alimentos', {
-    name, 
-    quantity, 
-    expiration_time
-  }, {
+  const response = await api.post('api/alimentos', data, {
     headers: {
-      authorization: `Bearer ${token}`
-    }
+      authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
   });
-console.log(response)
-  return redirect('/');
+
+  if (response.status !== 201) {
+    throw new Error(`Failed to create food: ${response.statusText}`);
+  }
+
+  return redirect('/listfood');
 }
