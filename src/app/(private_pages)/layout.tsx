@@ -8,7 +8,6 @@ const PrivateLayout = async ({ children }: { children: ReactNode }) => {
   if (!token) {
     redirect("/");
   }
-  
   return <div> {children}</div>;
 };
 
