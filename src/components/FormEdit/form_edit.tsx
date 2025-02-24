@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -16,54 +16,64 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-
+} from "@/components/ui/popover";
+import { redirect } from "next/navigation";
+import Update_Alimento from "./action";
 
 const formSchema = z.object({
-  name: z.string()
-    .min(1, { message: "O Campos não pode estar vazio." }),
-  quantity: z.number()
-    .min(1, { message: "O campo não pode estar vazio." }),
-  expirationtime:z.date()
-})
+  name: z.string().min(1, { message: "O campo não pode estar vazio." }),
+  quantity: z.coerce.number().min(1, { message: "O campo não pode estar vazio." }),
+  expiration_time: z.coerce.date(),
+});
 
+type Alimento = {
+  id: string;
+  name: string;
+  expiration_time: Date;
+  quantity: number;
+};
 
-
-async function onSubmit() {
-
-}
-
-
-
-export function FormEdit() {
+export function Form_EditAliments({ alimento }: { alimento: Alimento }) {
   
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const formData: Alimento = {
+      id: alimento.id,
+      name: values.name,
+      quantity: values.quantity,
+      expiration_time: values.expiration_time,
+    };
+    
+    await Update_Alimento(alimento.id, formData);
+    redirect("/listfood");
+  }
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      quantity: 0,
+      name: alimento.name,
+      quantity: alimento.quantity,
+      expiration_time: new Date(alimento.expiration_time),
     },
-    
-  })
+  });
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-20 rounded-3xl shadow-lg max-w-3xl mx-auto bg-card text-card-foreground">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Cadastrar Alimento</h2>
+          <h2 className="text-2xl font-bold mb-4">Editar Alimento</h2>
         </div>
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Nome</FormLabel>
               <FormControl>
                 <Input className="w-full p-2 border border-gray-300 rounded-lg" {...field} />
               </FormControl>
@@ -88,7 +98,7 @@ export function FormEdit() {
 
         <FormField
           control={form.control}
-          name="expirationtime"
+          name="expiration_time"
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Data de Validade</FormLabel>
@@ -117,7 +127,7 @@ export function FormEdit() {
                     selected={field.value}
                     onSelect={field.onChange}
                     disabled={(date) =>
-                      date > new Date() || date < new Date("1900-01-01")
+                      date < new Date("1900-01-01")
                     }
                     initialFocus
                   />
@@ -127,13 +137,9 @@ export function FormEdit() {
             </FormItem>
           )}
         />
-        
 
-        <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200" type="submit">Entrar</Button>
-
-
-        
+        <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200" type="submit">Salvar</Button>
       </form>
     </Form>
-  )
+  );
 }

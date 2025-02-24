@@ -1,18 +1,20 @@
 import { notFound } from "next/navigation";
 import { api } from "@/app/service/server";
 import { cookies } from "next/headers";
-import { FormEdit } from "./form_edit";
+import { Form_EditAliments } from "./form_edit";
 
 type Alimento = {
+  id: string;
   name: string;
   expiration_time: Date;
   quantity: number;
 };
 
-const fetchAlimentById_edit = async (id: string): Promise<Alimento | null> => {
+const fetchAlimentoById = async (id: string): Promise<Alimento | null> => {
+  console.log(id)
   const jwt = (await cookies()).get("JWT");
   try {
-    const response = await api.get(`/api/alimentos/${id}`, {
+    const response = await api.get(`api/alimentos/${id}`, {
       headers: { authorization: `Bearer ${jwt!.value}` },
     });
     return response.data;
@@ -22,10 +24,10 @@ const fetchAlimentById_edit = async (id: string): Promise<Alimento | null> => {
   }
 };
 
-async function AlimentServer_edit({ params }: { params: { id: string } }) {
-  const Alimento = await fetchAlimentById_edit(params.id);
-  if (!Alimento) return notFound();
-  return <FormEdit Alimento={Alimento} />;
+async function AlimentoServer({ id }: { id: string }) {
+  const alimento = await fetchAlimentoById(id);
+  if (!alimento) return notFound();
+  return <Form_EditAliments alimento={alimento} />;
 }
 
-export default AlimentServer_edit;
+export default AlimentoServer;
