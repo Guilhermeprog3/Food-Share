@@ -1,6 +1,6 @@
 "use client"
 
-import { SchedulesList } from "@/components/SchedulesList";
+import { SchedulesList } from "@/components/ReservationsList";
 import Navbar_Private from '@/components/Navbar_Private'
 const Schedules_page = () => {
   return (
