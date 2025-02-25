@@ -5,31 +5,49 @@ import 'leaflet/dist/leaflet.css';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import ReactDOMServer from 'react-dom/server';
 import { Button } from '../ui/button';
+import Update_User from './action';
+import Get_UserById from './action_get_user';
 
 const OpenStreetMap = () => {
   const [center, setCenter] = useState({ lat: -4.043477, lng: 39.668205 });
-  const [location, setLocation] = useState({ loaded: false, coordinates: { lat: 0, lng: 0 }, error: null });
+  const [location, setLocation] = useState({
+    loaded: false,
+    coordinates: { lat: 0, lng: 0 },
+    error: null
+  });
+
   const ZOOM_LEVEL = 13;
   const mapRef = useRef<Map | null>(null);
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          console.log("User's location:", latitude, longitude);
-          setCenter({ lat: latitude, lng: longitude });
-          setLocation({ loaded: true, coordinates: { lat: latitude, lng: longitude }, error: null });
+    const fetchUserLocation = async () => {
+      const userData = await Get_UserById();
+      if (userData && userData.latitude && userData.longitude) {
+        const { latitude, longitude } = userData;
+        setCenter({ lat: latitude, lng: longitude });
+        setLocation({ loaded: true, coordinates: { lat: latitude, lng: longitude }, error: null });
 
-          if (mapRef.current) {
-            mapRef.current.setView([latitude, longitude], ZOOM_LEVEL);
+        if (mapRef.current) {
+          mapRef.current.setView([latitude, longitude], ZOOM_LEVEL);
+        }
+      } else if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setCenter({ lat: latitude, lng: longitude });
+            setLocation({ loaded: true, coordinates: { lat: latitude, lng: longitude }, error: null });
+
+            if (mapRef.current) {
+              mapRef.current.setView([latitude, longitude], ZOOM_LEVEL);
+            }
           }
-        },
-        
-      );
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
+        );
+      } else {
+        console.error("Geolocation is not supported by this browser.");
+      }
+    };
+
+    fetchUserLocation();
   }, []);
 
   const updateLocation = (lat: number, lng: number) => {
@@ -51,6 +69,21 @@ const OpenStreetMap = () => {
     iconAnchor: [12, 24],
     className: '',
   });
+
+  const handleUpdateUser = async () => {
+    const { lat, lng } = location.coordinates;
+
+    const updatedUser = await Update_User({
+      latitude: lat,
+      longitude: lng,
+    });
+
+    if (updatedUser) {
+      alert("Localização atualizada com sucesso!");
+    } else {
+      alert("Erro ao atualizar localização.");
+    }
+  };
 
   return (
     <div className="relative bg-card rounded-lg shadow-md">
@@ -78,7 +111,7 @@ const OpenStreetMap = () => {
         )}
       </div>
       <div className="flex justify-center mb-4">
-        <Button>Adicionar</Button>
+        <Button onClick={handleUpdateUser}>Adicionar</Button>
       </div>
     </div>
   );
