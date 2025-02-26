@@ -20,6 +20,10 @@ const Navbar_Private = () => {
     redirect("/dashboard")
   }
 
+  const handleAgendamento = () => {
+    redirect("/schedules")
+  }
+
   return (
     <div className="bg-card h-13 border-b-[0.5px] border-slate-50 p-3">
       <div className="flex content-center gap-60 justify-between">
@@ -27,11 +31,14 @@ const Navbar_Private = () => {
           <button onClick={handledashboard}>
             <img src={logo.src} alt="Food_share-Logo" className="h-[40px]" />
           </button>
-          <h1 className="ml-8 text-3xl">FoodsShare</h1>
+          <button onClick={handledashboard}>
+            <h1 className="ml-8 text-3xl">FoodsShare</h1>
+          </button>
+          
         </div>
         <div className="flex items-center space-x-4">
           <Button onClick={handlealiments} className="rounded-xl">Alimentos</Button>
-          <Button className="rounded-xl">Agendamentos</Button>
+          <Button onClick={handleAgendamento} className="rounded-xl">Reservas</Button>
           <Button className="rounded-xl" onClick={handleLogout}>
             Sair
           </Button>
