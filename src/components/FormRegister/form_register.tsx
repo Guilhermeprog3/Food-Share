@@ -29,7 +29,6 @@ const formSchema = z.object({
     .email({ message: "Digite um e-mail válido." }),
   password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres." }),
   confirmPassword: z.string().min(6, { message: "A confirmação de senha deve ter pelo menos 6 caracteres." }),
-  local: z.string().min(2, { message: "A cidade deve ter pelo menos 2 caracteres." }),
 });
 
 function HandleLogin() {
@@ -49,7 +48,6 @@ export function Form_Register() {
       email: "",
       password: "",
       confirmPassword: "",
-      local: "",
     },
   });
 
@@ -68,7 +66,6 @@ export function Form_Register() {
     formData.append("responsible", values.responsible);
     formData.append("email", values.email);
     formData.append("password", values.password);
-    formData.append("local", values.local);
 
     await handleSubmit(formData);
   }

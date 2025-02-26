@@ -12,15 +12,8 @@ const Get_UserById = async () => {
     }
   
     try {
-
-        const userId = "5198b95f-0807-4cad-ad7e-d6973f016088";
   
-      if (!userId) {
-        console.error("ID do usuário não encontrado no token.");
-        return null;
-      }
-  
-      const response = await api.get(`api/doadores/${userId}`, {
+      const response = await api.get(`api/doadores/`, {
         headers: { authorization: `Bearer ${jwtCookie.value}` },
       });
   
