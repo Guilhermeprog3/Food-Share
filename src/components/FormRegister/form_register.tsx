@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import bg from "@/assets/images/background2.png";
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -35,6 +37,9 @@ function HandleLogin() {
 }
 
 export function Form_Register() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,6 +52,14 @@ export function Form_Register() {
       local: "",
     },
   });
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const formData = new FormData();
@@ -62,7 +75,7 @@ export function Form_Register() {
 
   return (
     <Form {...form}>
-      <img className="fixed h-auto" src={bg.src} alt="" />
+      <img className="fixed h-auto fixed h-auto z-0" src={bg.src} alt="" />
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-6 p-20 rounded-3xl shadow-lg max-w-3xl mx-auto bg-card text-card-foreground mt-5"
@@ -147,12 +160,20 @@ export function Form_Register() {
               <FormItem>
                 <FormLabel>Senha</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                    placeholder="Digite sua senha"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                      placeholder="Digite sua senha"
+                      {...field}
+                    />
+                    <span
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={togglePasswordVisibility}
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </span>
+                  </div>
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -165,29 +186,20 @@ export function Form_Register() {
               <FormItem>
                 <FormLabel>Confirmar Senha</FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                    placeholder="Confirme sua senha"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-xs" />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="local"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Cidade</FormLabel>
-                <FormControl>
-                  <Input
-                    className="w-full p-2 border border-gray-300 rounded-lg"
-                    placeholder="Digite sua cidade"
-                    {...field}
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showConfirmPassword ? "text" : "password"}
+                      className="w-full p-2 border border-gray-300 rounded-lg"
+                      placeholder="Confirme sua senha"
+                      {...field}
+                    />
+                    <span
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                      onClick={toggleConfirmPasswordVisibility}
+                    >
+                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    </span>
+                  </div>
                 </FormControl>
                 <FormMessage className="text-xs" />
               </FormItem>
@@ -206,6 +218,7 @@ export function Form_Register() {
           <button
             onClick={HandleLogin}
             className="text-blue-500 hover:underline"
+            type="button"
           >
             aqui
           </button>

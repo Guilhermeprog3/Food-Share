@@ -86,12 +86,12 @@ const OpenStreetMap = () => {
   };
 
   return (
-    <div className="relative bg-card rounded-lg shadow-md">
+    <div className="relative bg-card rounded-lg border border-gray-200 p-2 shadow-md">
       <div className="p-6 bg-card">
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Especifique o ponto de Doação</h1>
         </div>
-        <div className="w-full h-[300px] border-2 border-gray-300 rounded-lg overflow-hidden relative z-0">
+        <div className="w-full h-[320px] border-2 border-gray-300 rounded-lg overflow-hidden relative z-0">
           <MapContainer center={center} zoom={ZOOM_LEVEL} ref={mapRef} className="h-full w-full" key={center.lat + center.lng}>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contribuidores'
