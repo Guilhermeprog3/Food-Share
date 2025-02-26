@@ -17,9 +17,8 @@ const Update_User = async (data: UserUpdate) => {
   }
 
   try {
-    const userId = "5198b95f-0807-4cad-ad7e-d6973f016088";
 
-    const response = await api.patch(`api/doadores/${userId}`, data, {
+    const response = await api.patch(`api/doadores/`, data, {
       headers: { authorization: `Bearer ${jwtCookie.value}` },
     });
 

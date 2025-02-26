@@ -9,10 +9,9 @@ export async function handleSubmit(formdata: FormData) {
   const responsible = formdata.get("responsible");
   const email = formdata.get("email");
   const password = formdata.get("password");
-  const local = formdata.get("local");
 
   await api.post('api/doadores', {
-    name, cnpj, responsible, email, password, local
+    name, cnpj, responsible, email, password
   });
 
   return redirect('/');

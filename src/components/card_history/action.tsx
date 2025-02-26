@@ -5,13 +5,14 @@ import { cookies } from "next/headers";
 
 const fetchDoações = async () => {
   const jwt = (await cookies()).get("JWT");
-  const response = await api.get(`api/list`, {
+  const response = await api.get(`api/reservas/list/token`, {
     headers: {
       authorization: `Bearer ${jwt!.value}`,
     },
   });
   return response.data;
 };
+
 
 
 

@@ -1,24 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardFooter, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { QRCodeSVG } from "qrcode.react";
 import { Calendar } from "@/components/ui/calendar";
-import { buttonVariants } from "@/components/ui/button"
+import { fetchReserva, CancelReserva, updateReserva } from "./action";
 
 interface Schedule {
-  id: number;
-  name: string;
-  data: string;
-  code: string;
+  id: string;
+  pickup_date: string;
+  token: string;
+  food: {
+    name: string;
+  };
+  food_quantity: number;
 }
-
-const schedules: Schedule[] = [
-  { id: 1, name: "Reserva 1", data: "00/00/0000", code: "147623tfrg76wqgf1" },
-  { id: 2, name: "Reserva 2", data: "00/00/0000", code: "19287432rytf8w7sd" },
-  { id: 3, name: "Reserva 3", data: "00/00/0000", code: "jf7q26g5tr34hf874" },
-];
 
 interface ModalProps {
   isOpen: boolean;
@@ -36,7 +33,10 @@ function Modal({ isOpen, onClose, qrCodeValue }: ModalProps) {
         <div className="flex justify-center mb-6">
           <QRCodeSVG value={qrCodeValue} size={200} />
         </div>
-        <Button onClick={onClose} className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-primary-dark transition-all duration-200">
+        <Button
+          onClick={onClose}
+          className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-primary-dark transition-all duration-200"
+        >
           Fechar
         </Button>
       </div>
@@ -75,10 +75,16 @@ function PostponeModal({ isOpen, onClose, onSelectDate }: PostponeModalProps) {
           />
         </div>
         <div className="flex gap-4">
-          <Button onClick={onClose} className="w-full bg-gray-500 text-white py-2 rounded-2xl hover:bg-gray-600 transition-all duration-200">
+          <Button
+            onClick={onClose}
+            className="w-full bg-gray-500 text-white py-2 rounded-2xl hover:bg-gray-600 transition-all duration-200"
+          >
             Cancelar
           </Button>
-          <Button onClick={handleConfirm} className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-primary-dark transition-all duration-200">
+          <Button
+            onClick={handleConfirm}
+            className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-primary-dark transition-all duration-200"
+          >
             Confirmar
           </Button>
         </div>
@@ -88,32 +94,62 @@ function PostponeModal({ isOpen, onClose, onSelectDate }: PostponeModalProps) {
 }
 
 export function SchedulesList() {
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isPostponeModalOpen, setIsPostponeModalOpen] = useState<boolean>(false);
-  const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
+  const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
 
-  const handleOpenModal = (id: number) => {
+  // Buscar as reservas ao carregar o componente
+  useEffect(() => {
+    const loadReservations = async () => {
+      const data = await fetchReserva();
+      setSchedules(data);
+    };
+
+    loadReservations();
+  }, []);
+
+  // Abrir o modal do QR Code
+  const handleOpenModal = (id: string) => {
     setSelectedScheduleId(id);
     setIsModalOpen(true);
   };
 
+  // Fechar o modal do QR Code
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedScheduleId(null);
   };
 
-  const handleOpenPostponeModal = (id: number) => {
+  // Abrir o modal de adiamento
+  const handleOpenPostponeModal = (id: string) => {
     setSelectedScheduleId(id);
     setIsPostponeModalOpen(true);
   };
 
+  // Fechar o modal de adiamento
   const handleClosePostponeModal = () => {
     setIsPostponeModalOpen(false);
     setSelectedScheduleId(null);
   };
 
-  const handleSelectDate = (date: Date) => {
-    console.log("Nova data selecionada:", date);
+  // Atualizar a data de retirada
+  const handleSelectDate = async (date: Date) => {
+    if (selectedScheduleId) {
+      await updateReserva(selectedScheduleId, date);
+      const updatedSchedules = schedules.map((schedule) =>
+        schedule.id === selectedScheduleId
+          ? { ...schedule, pickup_date: date.toISOString() }
+          : schedule
+      );
+      setSchedules(updatedSchedules);
+    }
+  };
+
+  // Cancelar uma reserva
+  const handleCancelReservation = async (id: string) => {
+    await CancelReserva(id);
+    setSchedules(schedules.filter((schedule) => schedule.id !== id));
   };
 
   return (
@@ -123,14 +159,18 @@ export function SchedulesList() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         {schedules.map((schedule) => (
-          <Card key={schedule.id} className="rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
+          <Card
+            key={schedule.id}
+            className="rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
+          >
             <CardHeader className="p-4 bg-gray-200 text-gray-800 rounded-t-xl">
-              <h3 className="text-lg font-semibold">{schedule.name}</h3>
-              <p className="text-sm mt-2">{schedule.data}</p>
+              <h3 className="text-lg font-semibold">{schedule.food.name}</h3>
+              <p className="text-sm mt-2">Data de retirada: {new Date(schedule.pickup_date).toLocaleDateString()}</p>
             </CardHeader>
             <CardContent className="p-4">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-4">Código: {schedule.code}</p>
+                <p className="text-sm text-gray-600 mb-4">Quantidade: {schedule.food_quantity}</p>
+                <p className="text-sm text-gray-600 mb-4">Token: {schedule.token}</p>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between p-4 space-x-4">
@@ -146,7 +186,12 @@ export function SchedulesList() {
               >
                 Adiar
               </Button>
-              <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl ">Cancelar</Button>
+              <Button
+                onClick={() => handleCancelReservation(schedule.id)}
+                className="w-full bg-primary text-primary-foreground py-2 rounded-2xl"
+              >
+                Cancelar
+              </Button>
             </CardFooter>
           </Card>
         ))}
@@ -154,12 +199,18 @@ export function SchedulesList() {
       <div className="flex justify-center mt-4">
         <p className="text-xs text-gray-500">Reservas Agendadas</p>
       </div>
-      
+
+
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        qrCodeValue={selectedScheduleId ? `${selectedScheduleId}` : ""}
+        qrCodeValue={
+          selectedScheduleId
+            ? schedules.find((schedule) => schedule.id === selectedScheduleId)?.token || ""
+            : ""
+        }
       />
+
 
       <PostponeModal
         isOpen={isPostponeModalOpen}
