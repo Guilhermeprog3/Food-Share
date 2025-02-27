@@ -14,7 +14,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -24,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import { fetchDoações, getalimentforid } from "./action";
+import fetchDoações from "./action";
 
 interface Schedule {
   id: string;
@@ -32,7 +31,6 @@ interface Schedule {
   title: string;
   food: {
     id: string;
-    name?: string;
   };
   food_quantity: number;
   status: string;
@@ -43,32 +41,22 @@ export const columns: ColumnDef<Schedule>[] = [
     id: "title",
     header: "Título",
     accessorKey: "title",
-    cell: ({ row }) => <div>{row.getValue("title") as string}</div>,
-  },
-  {
-    id: "food_name",
-    header: "Nome do Alimento",
-    accessorKey: "food.name",
-    cell: ({ row }) => (
-      <div>{(row.getValue("food") as { name?: string }).name || "Desconhecido"}</div>
-    ),
+    cell: ({ row }) => <div>{row.getValue("title")}</div>,
   },
   {
     accessorKey: "food_quantity",
     header: "Quantidade",
-    cell: ({ row }) => <div>{row.getValue("food_quantity") as number}</div>,
+    cell: ({ row }) => <div>{row.getValue("food_quantity")}</div>,
   },
   {
     accessorKey: "pickup_date",
     header: "Data de Retirada",
-    cell: ({ row }) => (
-      <div>{new Date(row.getValue("pickup_date") as string).toLocaleDateString()}</div>
-    ),
+    cell: ({ row }) => <div>{new Date(row.getValue("pickup_date")).toLocaleDateString()}</div>,
   },
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => <div>{row.getValue("status") as string}</div>,
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
   },
 ];
 
@@ -83,32 +71,8 @@ export function CardHistList() {
     setLoading(true);
     try {
       const data = await fetchDoações();
-      console.log("Dados recebidos do fetchDoações:", data);
-      const schedulesWithFoodNames = await Promise.all(
-        data.map(async (schedule) => {
-          try {
-            console.log("Chamando getalimentforid para o ID:", schedule.food.id);
-            const foodName = await getalimentforid(schedule.food.id);
-            return {
-              ...schedule,
-              food: {
-                ...schedule.food,
-                name: foodName,
-              },
-            };
-          } catch (error) {
-            console.error(`Erro ao carregar nome do alimento para o ID ${schedule.food.id}:`, error);
-            return {
-              ...schedule,
-              food: {
-                ...schedule.food,
-                name: "Desconhecido",
-              },
-            };
-          }
-        })
-      );
-      setSchedules(schedulesWithFoodNames);
+
+      setSchedules(data);
     } catch (error) {
       console.error("Erro ao carregar doações:", error);
     } finally {
@@ -142,17 +106,7 @@ export function CardHistList() {
   }
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filtrar por nome do alimento..."
-          value={(table.getColumn("food_name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("food_name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-      </div>
+    <div className="w-full">   
       <div className="rounded-md border">
         <Table>
           <TableHeader>

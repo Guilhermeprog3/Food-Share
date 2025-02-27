@@ -19,8 +19,9 @@ export const fetchReserva = async () => {
 export const CancelReserva = async (id: string) => {
   const jwt = (await cookies()).get("JWT");
   const response = await api.patch(
-    `api/reservas/${id}/cancel`,
+    `api/reservas/${id}/cancel`,[],
     {
+      
       headers: {
         authorization: `Bearer ${jwt!.value}`,
       },
