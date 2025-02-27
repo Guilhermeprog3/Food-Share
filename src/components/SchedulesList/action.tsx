@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 
 export const fetchReserva = async () => {
   const jwt = (await cookies()).get("JWT");
-  const response = await api.get(`api/reservas/`, {
+  const response = await api.get(`api/reservas/pendentes/`, {
     headers: {
       authorization: `Bearer ${jwt!.value}`,
     },
