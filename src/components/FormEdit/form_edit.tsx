@@ -23,6 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { redirect } from "next/navigation";
 import Update_Alimento from "./action";
 
@@ -30,6 +31,7 @@ const formSchema = z.object({
   name: z.string().min(1, { message: "O campo não pode estar vazio." }),
   quantity: z.coerce.number().min(1, { message: "O campo não pode estar vazio." }),
   expiration_time: z.coerce.date(),
+  description: z.string().optional(), 
 });
 
 type Alimento = {
@@ -37,18 +39,20 @@ type Alimento = {
   name: string;
   expiration_time: Date;
   quantity: number;
+  description?: string;  // Optional description field
 };
 
 export function Form_EditAliments({ alimento }: { alimento: Alimento }) {
-  
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const formData: Alimento = {
       id: alimento.id,
       name: values.name,
       quantity: values.quantity,
       expiration_time: values.expiration_time,
+      description: values.description,  // Include description in the formData
     };
-    
+
     await Update_Alimento(alimento.id, formData);
     redirect("/listfood");
   }
@@ -59,6 +63,7 @@ export function Form_EditAliments({ alimento }: { alimento: Alimento }) {
       name: alimento.name,
       quantity: alimento.quantity,
       expiration_time: new Date(alimento.expiration_time),
+      description: alimento.description,  // Default value for description
     },
   });
 
@@ -133,6 +138,20 @@ export function Form_EditAliments({ alimento }: { alimento: Alimento }) {
                   />
                 </PopoverContent>
               </Popover>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descrição</FormLabel>
+              <FormControl>
+                <Textarea className="w-full p-2 border border-gray-300 rounded-lg h-24" {...field} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

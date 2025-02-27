@@ -9,6 +9,7 @@ import { fetchReserva, CancelReserva, updateReserva } from "./action";
 
 interface Schedule {
   id: string;
+  title:string;
   pickup_date: string;
   token: string;
   food: {
@@ -48,10 +49,17 @@ interface PostponeModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectDate: (date: Date) => void;
+  initialDate?: Date;
 }
 
-function PostponeModal({ isOpen, onClose, onSelectDate }: PostponeModalProps) {
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+function PostponeModal({ isOpen, onClose, onSelectDate, initialDate }: PostponeModalProps) {
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(initialDate);
+
+  useEffect(() => {
+    if (initialDate) {
+      setSelectedDate(initialDate);
+    }
+  }, [initialDate]);
 
   if (!isOpen) return null;
 
@@ -98,8 +106,8 @@ export function SchedulesList() {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isPostponeModalOpen, setIsPostponeModalOpen] = useState<boolean>(false);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
+  const [selectedScheduleDate, setSelectedScheduleDate] = useState<Date | null>(null);
 
-  // Buscar as reservas ao carregar o componente
   useEffect(() => {
     const loadReservations = async () => {
       const data = await fetchReserva();
@@ -109,31 +117,28 @@ export function SchedulesList() {
     loadReservations();
   }, []);
 
-  // Abrir o modal do QR Code
   const handleOpenModal = (id: string) => {
     setSelectedScheduleId(id);
     setIsModalOpen(true);
   };
 
-  // Fechar o modal do QR Code
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedScheduleId(null);
   };
 
-  // Abrir o modal de adiamento
-  const handleOpenPostponeModal = (id: string) => {
+  const handleOpenPostponeModal = (id: string, pickup_date: string) => {
     setSelectedScheduleId(id);
+    setSelectedScheduleDate(new Date(pickup_date));
     setIsPostponeModalOpen(true);
   };
 
-  // Fechar o modal de adiamento
   const handleClosePostponeModal = () => {
     setIsPostponeModalOpen(false);
     setSelectedScheduleId(null);
+    setSelectedScheduleDate(null);
   };
 
-  // Atualizar a data de retirada
   const handleSelectDate = async (date: Date) => {
     if (selectedScheduleId) {
       await updateReserva(selectedScheduleId, date);
@@ -146,7 +151,6 @@ export function SchedulesList() {
     }
   };
 
-  // Cancelar uma reserva
   const handleCancelReservation = async (id: string) => {
     await CancelReserva(id);
     setSchedules(schedules.filter((schedule) => schedule.id !== id));
@@ -164,13 +168,13 @@ export function SchedulesList() {
             className="rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
           >
             <CardHeader className="p-4 bg-gray-200 text-gray-800 rounded-t-xl">
-              <h3 className="text-lg font-semibold">{schedule.food.name}</h3>
+            <h3 className="text-lg font-semibold">{schedule.title}</h3>
               <p className="text-sm mt-2">Data de retirada: {new Date(schedule.pickup_date).toLocaleDateString()}</p>
             </CardHeader>
             <CardContent className="p-4">
               <div className="text-center">
+                <h3 className="text-lg font-semibold">{schedule.food.name}</h3>
                 <p className="text-sm text-gray-600 mb-4">Quantidade: {schedule.food_quantity}</p>
-                <p className="text-sm text-gray-600 mb-4">Token: {schedule.token}</p>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between p-4 space-x-4">
@@ -181,7 +185,7 @@ export function SchedulesList() {
                 QR code
               </Button>
               <Button
-                onClick={() => handleOpenPostponeModal(schedule.id)}
+                onClick={() => handleOpenPostponeModal(schedule.id, schedule.pickup_date)}
                 className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200"
               >
                 Adiar
@@ -200,7 +204,6 @@ export function SchedulesList() {
         <p className="text-xs text-gray-500">Reservas Agendadas</p>
       </div>
 
-
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
@@ -211,11 +214,11 @@ export function SchedulesList() {
         }
       />
 
-
       <PostponeModal
         isOpen={isPostponeModalOpen}
         onClose={handleClosePostponeModal}
         onSelectDate={handleSelectDate}
+        initialDate={selectedScheduleDate || undefined}
       />
     </div>
   );

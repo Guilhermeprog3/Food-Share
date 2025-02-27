@@ -1,11 +1,9 @@
 "use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -18,6 +16,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "../ui/textarea";
 import {
   Popover,
   PopoverContent,
@@ -30,6 +29,7 @@ const formSchema = z.object({
   name: z.string().min(1, { message: "O campo não pode estar vazio." }),
   quantity: z.coerce.number().min(1, { message: "O campo não pode estar vazio." }),
   expiration_time: z.coerce.date(),
+  description: z.string().optional(),
 });
 
 async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -37,6 +37,7 @@ async function onSubmit(values: z.infer<typeof formSchema>) {
   formData.append("name", values.name);
   formData.append("quantity", values.quantity.toString());
   formData.append("expiration_time", values.expiration_time.toISOString());
+  formData.append("description", values.description || "");
   
   await handleSubmit(formData);
 
@@ -50,6 +51,7 @@ export function Form_CreateAliments() {
       name: "",
       quantity: 0,
       expiration_time: new Date(),
+      description: "",
     },
   });
 
@@ -129,8 +131,22 @@ export function Form_CreateAliments() {
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Descrição</FormLabel>
+              <FormControl>
+                <Textarea className="w-full p-2 border border-gray-300 rounded-lg h-24" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <Button className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200" type="submit">Cadastrar</Button>
       </form>
     </Form>
-  );
+  )
 }

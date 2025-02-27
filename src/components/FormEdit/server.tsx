@@ -8,6 +8,7 @@ type Alimento = {
   name: string;
   expiration_time: Date;
   quantity: number;
+  description: string;
 };
 
 const fetchAlimentoById = async (id: string): Promise<Alimento | null> => {
