@@ -9,11 +9,11 @@ import { fetchReserva, CancelReserva, updateReserva } from "./action";
 
 interface Schedule {
   id: string;
-  title:string;
+  title: string;
   pickup_date: string;
   token: string;
   food: {
-    name: string;
+    id:string
   };
   food_quantity: number;
 }
@@ -34,10 +34,7 @@ function Modal({ isOpen, onClose, qrCodeValue }: ModalProps) {
         <div className="flex justify-center mb-6">
           <QRCodeSVG value={qrCodeValue} size={200} />
         </div>
-        <Button
-          onClick={onClose}
-          className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-primary-dark transition-all duration-200"
-        >
+        <Button onClick={onClose} className="w-full bg-primary text-primary-foreground py-2 rounded-2xl">
           Fechar
         </Button>
       </div>
@@ -45,14 +42,7 @@ function Modal({ isOpen, onClose, qrCodeValue }: ModalProps) {
   );
 }
 
-interface PostponeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelectDate: (date: Date) => void;
-  initialDate?: Date;
-}
-
-function PostponeModal({ isOpen, onClose, onSelectDate, initialDate }: PostponeModalProps) {
+function PostponeModal({ isOpen, onClose, onSelectDate, initialDate }: any) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(initialDate);
 
   useEffect(() => {
@@ -74,25 +64,12 @@ function PostponeModal({ isOpen, onClose, onSelectDate, initialDate }: PostponeM
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full">
         <h2 className="text-xl font-bold mb-6 text-center">Selecionar Nova Data</h2>
-        <div className="flex justify-center mb-6">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            className="rounded-md border"
-          />
-        </div>
-        <div className="flex gap-4">
-          <Button
-            onClick={onClose}
-            className="w-full bg-gray-500 text-white py-2 rounded-2xl hover:bg-gray-600 transition-all duration-200"
-          >
+        <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} className="rounded-md border" />
+        <div className="flex gap-4 mt-4">
+          <Button onClick={onClose} className="w-full bg-gray-500 text-white py-2 rounded-2xl">
             Cancelar
           </Button>
-          <Button
-            onClick={handleConfirm}
-            className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-primary-dark transition-all duration-200"
-          >
+          <Button onClick={handleConfirm} className="w-full bg-primary text-primary-foreground py-2 rounded-2xl">
             Confirmar
           </Button>
         </div>
@@ -103,8 +80,8 @@ function PostponeModal({ isOpen, onClose, onSelectDate, initialDate }: PostponeM
 
 export function SchedulesList() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isPostponeModalOpen, setIsPostponeModalOpen] = useState<boolean>(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPostponeModalOpen, setIsPostponeModalOpen] = useState(false);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
   const [selectedScheduleDate, setSelectedScheduleDate] = useState<Date | null>(null);
 
@@ -113,7 +90,6 @@ export function SchedulesList() {
       const data = await fetchReserva();
       setSchedules(data);
     };
-
     loadReservations();
   }, []);
 
@@ -142,12 +118,7 @@ export function SchedulesList() {
   const handleSelectDate = async (date: Date) => {
     if (selectedScheduleId) {
       await updateReserva(selectedScheduleId, date);
-      const updatedSchedules = schedules.map((schedule) =>
-        schedule.id === selectedScheduleId
-          ? { ...schedule, pickup_date: date.toISOString() }
-          : schedule
-      );
-      setSchedules(updatedSchedules);
+      setSchedules(schedules.map((s) => (s.id === selectedScheduleId ? { ...s, pickup_date: date.toISOString() } : s)));
     }
   };
 
@@ -158,68 +129,27 @@ export function SchedulesList() {
 
   return (
     <div className="space-y-8 p-10 rounded-3xl shadow-lg max-w-4xl mx-auto bg-card text-gray-800">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold mb-6">Reservas</h2>
-      </div>
+      <h2 className="text-3xl font-bold text-center">Reservas</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
         {schedules.map((schedule) => (
-          <Card
-            key={schedule.id}
-            className="rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
-          >
-            <CardHeader className="p-4 bg-gray-200 text-gray-800 rounded-t-xl">
-            <h3 className="text-lg font-semibold">{schedule.title}</h3>
-              <p className="text-sm mt-2">Data de retirada: {new Date(schedule.pickup_date).toLocaleDateString()}</p>
+          <Card key={schedule.id} className="rounded-xl shadow-md">
+            <CardHeader className="p-4 bg-gray-200 rounded-t-xl">
+              <h3 className="text-lg font-semibold">{schedule.title}</h3>
+              <p className="text-sm">Data de retirada: {new Date(schedule.pickup_date).toLocaleDateString()}</p>
             </CardHeader>
-            <CardContent className="p-4">
-              <div className="text-center">
-                <h3 className="text-lg font-semibold">{schedule.food.name}</h3>
-                <p className="text-sm text-gray-600 mb-4">Quantidade: {schedule.food_quantity}</p>
-              </div>
+            <CardContent className="p-4 text-center">
+              <p className="text-sm text-gray-600">Quantidade: {schedule.food_quantity}</p>
             </CardContent>
             <CardFooter className="flex justify-between p-4 space-x-4">
-              <Button
-                onClick={() => handleOpenModal(schedule.id)}
-                className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200"
-              >
-                QR code
-              </Button>
-              <Button
-                onClick={() => handleOpenPostponeModal(schedule.id, schedule.pickup_date)}
-                className="w-full bg-primary text-primary-foreground py-2 rounded-2xl hover:bg-orange-200"
-              >
-                Adiar
-              </Button>
-              <Button
-                onClick={() => handleCancelReservation(schedule.id)}
-                className="w-full bg-primary text-primary-foreground py-2 rounded-2xl"
-              >
-                Cancelar
-              </Button>
+              <Button onClick={() => handleOpenModal(schedule.id)}>QR Code</Button>
+              <Button onClick={() => handleOpenPostponeModal(schedule.id, schedule.pickup_date)}>Adiar</Button>
+              <Button onClick={() => handleCancelReservation(schedule.id)}>Cancelar</Button>
             </CardFooter>
           </Card>
         ))}
       </div>
-      <div className="flex justify-center mt-4">
-        <p className="text-xs text-gray-500">Reservas Agendadas</p>
-      </div>
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        qrCodeValue={
-          selectedScheduleId
-            ? schedules.find((schedule) => schedule.id === selectedScheduleId)?.token || ""
-            : ""
-        }
-      />
-
-      <PostponeModal
-        isOpen={isPostponeModalOpen}
-        onClose={handleClosePostponeModal}
-        onSelectDate={handleSelectDate}
-        initialDate={selectedScheduleDate || undefined}
-      />
+      <Modal isOpen={isModalOpen} onClose={handleCloseModal} qrCodeValue={selectedScheduleId ? schedules.find((s) => s.id === selectedScheduleId)?.token || "" : ""} />
+      <PostponeModal isOpen={isPostponeModalOpen} onClose={handleClosePostponeModal} onSelectDate={handleSelectDate} initialDate={selectedScheduleDate || undefined} />
     </div>
   );
 }

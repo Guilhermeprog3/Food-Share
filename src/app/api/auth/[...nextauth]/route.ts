@@ -14,7 +14,7 @@ export const handlerAuth = NextAuth({
         password: {type:"password"},
         },
         async authorize(credentials) {
-          const res = await fetch(`https://food-share-api.onrender.com/api/sessao`,{
+          const res = await fetch(`http://localhost:3333/api/sessao`,{
             method: "POST",
             body: JSON.stringify(credentials),
             headers: { "Content-type":"application/json" },

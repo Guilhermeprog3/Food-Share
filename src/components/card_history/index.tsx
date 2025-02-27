@@ -14,7 +14,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -24,17 +23,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState } from "react";
-import fetchDoações from './action';
+import fetchDoações from "./action";
 
 interface Schedule {
   id: string;
   pickup_date: string;
   title: string;
   food: {
-    name: string;
+    id: string;
   };
   food_quantity: number;
-  status: string; 
+  status: string;
 }
 
 export const columns: ColumnDef<Schedule>[] = [
@@ -43,12 +42,6 @@ export const columns: ColumnDef<Schedule>[] = [
     header: "Título",
     accessorKey: "title",
     cell: ({ row }) => <div>{row.getValue("title")}</div>,
-  },
-  {
-    id: "food_name",
-    header: "Nome do Alimento",
-    accessorFn: (row) => row.food.name,
-    cell: ({ row }) => <div>{row.original.food.name}</div>,
   },
   {
     accessorKey: "food_quantity",
@@ -78,6 +71,7 @@ export function CardHistList() {
     setLoading(true);
     try {
       const data = await fetchDoações();
+
       setSchedules(data);
     } catch (error) {
       console.error("Erro ao carregar doações:", error);
@@ -112,17 +106,7 @@ export function CardHistList() {
   }
 
   return (
-    <div className="w-full">
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filtrar por nome do alimento..."
-          value={(table.getColumn("food_name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("food_name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
-      </div>
+    <div className="w-full">   
       <div className="rounded-md border">
         <Table>
           <TableHeader>
