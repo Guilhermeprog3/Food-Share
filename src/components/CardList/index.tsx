@@ -34,7 +34,7 @@ type Aliment = {
   quantity: string;
 };
 
-export const columns: ColumnDef<Aliment>[] = [
+const getColumns = (reloadData: () => void): ColumnDef<Aliment>[] => [
   {
     accessorKey: "name",
     header: "Nome",
@@ -48,28 +48,30 @@ export const columns: ColumnDef<Aliment>[] = [
   {
     accessorKey: "expiration_time",
     header: "Data de Validade",
-    cell: ({ row }) => <div>{row.getValue("expiration_time")}</div>,
+    cell: ({ row }) => {
+      const expirationTime = row.getValue("expiration_time") as string;
+      const formattedDate = new Date(expirationTime).toLocaleDateString("pt-BR"); // Formato brasileiro: dd/MM/yyyy
+      return <div>{formattedDate}</div>;
+    },
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
       const aliment = row.original;
-
       const handleDelete = async (id: string) => {
         await deleteAliments(id);
+        reloadData();
       };
-
-      const handleedit = (id:string) => {
-          redirect(`/editaraliments/${id}`);
-      }
-
+      const handleEdit = (id: string) => {
+        redirect(`/editaraliments/${id}`);
+      };
       return (
         <div className="flex justify-end space-x-2">
           <Button variant="outline" onClick={() => handleDelete(aliment.id)}>
             Excluir
           </Button>
-          <Button variant="outline" onClick={() =>handleedit(aliment.id)}>
+          <Button variant="outline" onClick={() => handleEdit(aliment.id)}>
             Editar
           </Button>
         </div>
@@ -98,7 +100,7 @@ export function CardDemoList() {
 
   const table = useReactTable({
     data: alimentos,
-    columns,
+    columns: getColumns(reloadData),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -165,7 +167,7 @@ export function CardDemoList() {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={getColumns(reloadData).length}
                   className="h-24 text-center"
                 >
                   Nenhum resultado encontrado.

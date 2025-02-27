@@ -13,11 +13,12 @@ const Get_UserById = async () => {
   
     try {
   
-      const response = await api.get(`api/doadores/`, {
+      const response = await api.get(`api/doadores/location`, {
         headers: { authorization: `Bearer ${jwtCookie.value}` },
       });
-  
+      console.log(response.data)
       return response.data;
+      
     } catch (error) {
       console.error("Erro ao obter usuário:", error);
       return null;

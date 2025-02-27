@@ -11,15 +11,15 @@ export const fetchReserva = async () => {
       authorization: `Bearer ${jwt!.value}`,
     },
   });
+  console.log(response.data)
   return response.data;
 };
 
 
 export const CancelReserva = async (id: string) => {
   const jwt = (await cookies()).get("JWT");
-  const response = await api.put(
+  const response = await api.patch(
     `api/reservas/${id}/cancel`,
-    {},
     {
       headers: {
         authorization: `Bearer ${jwt!.value}`,
@@ -31,8 +31,8 @@ export const CancelReserva = async (id: string) => {
 
 export const updateReserva = async (id: string, pickup_date: Date) => {
   const jwt = (await cookies()).get("JWT");
-  const response = await api.put(
-    `api/reservas/${id}`,
+  const response = await api.patch(
+    `api/reservas/${id}/date`,
     { pickup_date },
     {
       headers: {

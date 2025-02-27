@@ -26,43 +26,64 @@ import {
 import { useEffect, useState } from "react";
 import fetchDoações from './action';
 
-type Doação = {
+interface Schedule {
   id: string;
-  nome: string;
-  quantidade: string;
-  dataDoação: string;
-};
+  pickup_date: string;
+  title: string;
+  food: {
+    name: string;
+  };
+  food_quantity: number;
+  status: string; 
+}
 
-export const columns: ColumnDef<Doação>[] = [
+export const columns: ColumnDef<Schedule>[] = [
   {
-    accessorKey: "nome",
-    header: "Nome",
-    cell: ({ row }) => <div>{row.getValue("nome")}</div>,
+    id: "title",
+    header: "Título",
+    accessorKey: "title",
+    cell: ({ row }) => <div>{row.getValue("title")}</div>,
   },
   {
-    accessorKey: "quantidade",
+    id: "food_name",
+    header: "Nome do Alimento",
+    accessorFn: (row) => row.food.name,
+    cell: ({ row }) => <div>{row.original.food.name}</div>,
+  },
+  {
+    accessorKey: "food_quantity",
     header: "Quantidade",
-    cell: ({ row }) => <div>{row.getValue("quantidade")}</div>,
+    cell: ({ row }) => <div>{row.getValue("food_quantity")}</div>,
   },
   {
-    accessorKey: "dataDoação",
-    header: "Data de Doação",
-    cell: ({ row }) => <div>{row.getValue("dataDoação")}</div>,
+    accessorKey: "pickup_date",
+    header: "Data de Retirada",
+    cell: ({ row }) => <div>{new Date(row.getValue("pickup_date")).toLocaleDateString()}</div>,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
   },
 ];
 
 export function CardHistList() {
-  const [doacoes, setDoacoes] = useState<Doação[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [loading, setLoading] = useState(true);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 
   const reloadData = async () => {
-    const data = await fetchDoações();
-    setDoacoes(data);
+    setLoading(true);
+    try {
+      const data = await fetchDoações();
+      setSchedules(data);
+    } catch (error) {
+      console.error("Erro ao carregar doações:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -70,7 +91,7 @@ export function CardHistList() {
   }, []);
 
   const table = useReactTable({
-    data: doacoes,
+    data: schedules,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -86,14 +107,18 @@ export function CardHistList() {
     },
   });
 
+  if (loading) {
+    return <div>Carregando...</div>;
+  }
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filtrar por nome..."
-          value={(table.getColumn("nome")?.getFilterValue() as string) ?? ""}
+          placeholder="Filtrar por nome do alimento..."
+          value={(table.getColumn("food_name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("nome")?.setFilterValue(event.target.value)
+            table.getColumn("food_name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -166,6 +191,9 @@ export function CardHistList() {
           >
             Próxima
           </Button>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()}
         </div>
       </div>
     </div>
