@@ -14,6 +14,7 @@ interface Schedule {
   token: string;
   food: {
     id:string
+    name: string;
   };
   food_quantity: number;
 }
@@ -139,6 +140,7 @@ export function SchedulesList() {
             </CardHeader>
             <CardContent className="p-4 text-center">
               <p className="text-sm text-gray-600">Quantidade: {schedule.food_quantity}</p>
+              <p className="text-sm text-gray-600">Alimento: {schedule.food.name}</p>
             </CardContent>
             <CardFooter className="flex justify-between p-4 space-x-4">
               <Button onClick={() => handleOpenModal(schedule.id)}>QR Code</Button>

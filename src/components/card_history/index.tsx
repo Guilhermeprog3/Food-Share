@@ -31,6 +31,7 @@ interface Schedule {
   title: string;
   food: {
     id: string;
+    name: string;
   };
   food_quantity: number;
   status: string;
@@ -42,6 +43,11 @@ export const columns: ColumnDef<Schedule>[] = [
     header: "Título",
     accessorKey: "title",
     cell: ({ row }) => <div>{row.getValue("title")}</div>,
+  },
+  {
+    accessorKey: "food.name",
+    header: "Nome do Alimento",
+    cell: ({ row }) => <div>{row.original.food.name}</div>,
   },
   {
     accessorKey: "food_quantity",
