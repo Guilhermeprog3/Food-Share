@@ -39,7 +39,7 @@ type Alimento = {
   name: string;
   expiration_time: Date;
   quantity: number;
-  description?: string;  // Optional description field
+  description?: string;
 };
 
 export function Form_EditAliments({ alimento }: { alimento: Alimento }) {
@@ -50,7 +50,7 @@ export function Form_EditAliments({ alimento }: { alimento: Alimento }) {
       name: values.name,
       quantity: values.quantity,
       expiration_time: values.expiration_time,
-      description: values.description,  // Include description in the formData
+      description: values.description,
     };
 
     await Update_Alimento(alimento.id, formData);
@@ -63,7 +63,7 @@ export function Form_EditAliments({ alimento }: { alimento: Alimento }) {
       name: alimento.name,
       quantity: alimento.quantity,
       expiration_time: new Date(alimento.expiration_time),
-      description: alimento.description,  // Default value for description
+      description: alimento.description,
     },
   });
 
