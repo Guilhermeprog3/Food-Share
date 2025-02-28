@@ -50,7 +50,7 @@ const getColumns = (reloadData: () => void): ColumnDef<Aliment>[] => [
     header: "Data de Validade",
     cell: ({ row }) => {
       const expirationTime = row.getValue("expiration_time") as string;
-      const formattedDate = new Date(expirationTime).toLocaleDateString("pt-BR"); // Formato brasileiro: dd/MM/yyyy
+      const formattedDate = new Date(expirationTime).toLocaleDateString("pt-BR");
       return <div>{formattedDate}</div>;
     },
   },
